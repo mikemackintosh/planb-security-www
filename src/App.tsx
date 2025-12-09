@@ -118,6 +118,18 @@ let episodes = await getAllEpisodes("https://anchor.fm/s/e741494c/podcast/rss")
 
 function App() {
   const gtmParams = { id: 'G-W86BT3ZBT6' }
+
+  useEffect(() => {
+    // Handle route-based navigation to episodes (e.g., /12345678)
+    const path = window.location.pathname.slice(1) // Remove leading slash
+    if (path && /^\d+$/.test(path)) {
+      const element = document.getElementById(path)
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth' })
+      }
+    }
+  }, [])
+
   return (
     <>
       <GTMProvider state={gtmParams}>
