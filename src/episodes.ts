@@ -4,6 +4,7 @@ import { array, number, object, parse, string } from 'valibot';
 export interface Episode {
   id: number
   title: string
+  slug: string
   published: Date
   description: string
   content: string
@@ -12,6 +13,17 @@ export interface Episode {
     src: string
     type: string
   }
+}
+
+export function slugify(title: string): string {
+  return title
+    .toLowerCase()
+    .replace(/['']/g, '')           // Remove apostrophes
+    .replace(/[^a-z0-9\s-]/g, '')   // Remove special characters
+    .replace(/\s+/g, '-')           // Replace spaces with hyphens
+    .replace(/-+/g, '-')            // Replace multiple hyphens with single
+    .replace(/^-|-$/g, '')          // Remove leading/trailing hyphens
+    .slice(0, 80)                   // Limit length
 }
 
 export async function getAllEpisodes(feedUrl: string) {
@@ -42,6 +54,7 @@ export async function getAllEpisodes(feedUrl: string) {
     ({ id, title, description, content, itunes_duration, enclosures, published }) => ({
       id,
       title: `${title}`,
+      slug: slugify(title),
       published: new Date(published),
       description,
       content,
