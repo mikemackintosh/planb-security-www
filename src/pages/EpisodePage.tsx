@@ -6,6 +6,7 @@ import { EpisodePlayButton } from '../EpisodePlayButton'
 import { PauseIcon } from '../PauseIcon'
 import { PlayIcon } from '../PlayIcon'
 import { useMeta } from '../useMeta'
+import { articleMetaForEpisode } from '../blog'
 
 interface EpisodePageProps {
   episodes: Episode[]
@@ -40,6 +41,7 @@ export function EpisodePage({ episodes }: EpisodePageProps) {
   const nextEpisode = episodeIndex > 0 ? episodes[episodeIndex - 1] : null
 
   const safeHtml = DOMPurify.sanitize(html, { ADD_ATTR: ['target', 'rel'] })
+  const article = articleMetaForEpisode(episode)
 
   return (
     <div className="mx-auto max-w-4xl px-4 py-10 sm:px-6 lg:px-8">
@@ -83,6 +85,15 @@ export function EpisodePage({ episodes }: EpisodePageProps) {
             />
             <span className="font-mono text-sm text-slate-400">{episode.itunes_duration}</span>
           </div>
+          {article && (
+            <Link
+              to={`/blog/${article.slug}`}
+              className="mt-4 inline-flex items-center gap-2 text-sm font-semibold text-slate-300 transition hover:text-brand-orange"
+            >
+              📖 Read the companion article
+              <span aria-hidden="true">→</span>
+            </Link>
+          )}
         </div>
 
         {/* Episode content */}

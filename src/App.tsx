@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { lazy, Suspense } from 'react'
 import { BrowserRouter, Routes, Route, Navigate, useParams, Link } from 'react-router-dom'
 import './App.css'
 import { AudioProvider } from './AudioProvider'
@@ -7,6 +7,11 @@ import { type Episode, getAllEpisodes } from './episodes'
 import { GTMProvider } from '@elgorditosalsero/react-gtm-hook'
 import { HomePage } from './pages/HomePage'
 import { EpisodePage } from './pages/EpisodePage'
+
+// Blog content (37 markdown articles + the markdown renderer) is split into its
+// own chunk so it only loads when a visitor opens the blog.
+const BlogPage = lazy(() => import('./pages/BlogPage').then((m) => ({ default: m.BlogPage })))
+const ArticlePage = lazy(() => import('./pages/ArticlePage').then((m) => ({ default: m.ArticlePage })))
 import {
   InstagramIcon,
   XIcon,
@@ -69,14 +74,22 @@ function Navbar() {
           </Link>
         )}
 
-        <a
-          href="https://x.com/mikemackintosh"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="hidden whitespace-nowrap text-sm text-slate-400 transition hover:text-white md:block"
-        >
-          Hosted by <span className="font-semibold text-slate-200">@mikemackintosh</span>
-        </a>
+        <div className="flex shrink-0 items-center gap-5">
+          <Link
+            to="/blog"
+            className="text-sm font-medium text-slate-300 transition hover:text-brand-orange"
+          >
+            Blog
+          </Link>
+          <a
+            href="https://x.com/mikemackintosh"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="hidden whitespace-nowrap text-sm text-slate-400 transition hover:text-white md:block"
+          >
+            Hosted by <span className="font-semibold text-slate-200">@mikemackintosh</span>
+          </a>
+        </div>
       </div>
     </header>
   )
@@ -123,12 +136,16 @@ function App() {
 
           {/* Main content */}
           <main className="isolate pb-32">
-            <Routes>
-              <Route path="/" element={<HomePage episodes={episodes} />} />
-              <Route path="/episodes/:slug" element={<EpisodePage episodes={episodes} />} />
-              {/* Legacy redirect for old numeric URLs */}
-              <Route path="/:id" element={<LegacyRedirect episodes={episodes} />} />
-            </Routes>
+            <Suspense fallback={<div className="px-6 py-20 text-center text-slate-500">Loading…</div>}>
+              <Routes>
+                <Route path="/" element={<HomePage episodes={episodes} />} />
+                <Route path="/episodes/:slug" element={<EpisodePage episodes={episodes} />} />
+                <Route path="/blog" element={<BlogPage episodes={episodes} />} />
+                <Route path="/blog/:slug" element={<ArticlePage episodes={episodes} />} />
+                {/* Legacy redirect for old numeric URLs */}
+                <Route path="/:id" element={<LegacyRedirect episodes={episodes} />} />
+              </Routes>
+            </Suspense>
           </main>
 
           <Footer />
