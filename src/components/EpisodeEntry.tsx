@@ -7,70 +7,59 @@ import { PlayIcon } from '../PlayIcon'
 
 export function EpisodeEntry({ episode }: { episode: Episode }) {
   let date = new Date(episode.published)
+  let description = episode.description.replace(/<\/?p>/g, '').trim()
 
   return (
-    <>
-      <a id={episode.id.toString()} />
-      <article
-        aria-labelledby={`episode-${episode.id}-title`}
-        className="py-10 sm:py-12"
-      >
-        <div className="flex flex-col items-start">
-          <div className="rounded-t-lg bg-slate-800 p-4">
-            <div className="flex">
-              <h2
-                id={`episode-${episode.id}-title`}
-                className="flex-grow mt-2 pr-4 text-xl font-bold text-slate-100"
-              >
-                <Link to={`/episodes/${episode.slug}`}>{episode.title}</Link>
-              </h2>
-              <div className="flex-none font-bold text-sm w-14 items-center mr-4 mt-4 text-right">
-                <span className="text-white font-mono justify-end">
-                  {episode.itunes_duration}
-                </span>
-              </div>
-            </div>
+    <article aria-labelledby={`episode-${episode.id}-title`} className="py-6">
+      <div className="group rounded-2xl border border-white/5 bg-ink-800/60 p-5 transition hover:border-brand-purple/40 hover:bg-ink-800 sm:p-6">
+        <div className="flex items-start justify-between gap-4">
+          <div className="min-w-0">
             <FormattedDate
               date={date}
-              className="order-first font-mono leading-7 text-sm text-slate-500"
+              className="font-mono text-xs uppercase tracking-wide text-slate-500"
             />
-            <p className="mt-1 pb-2 leading-7 text-slate-300">
-              {episode.description.replace("<p>", "").replace("</p>", "")}
-            </p>
-          </div>
-          <div className="w-full px-5 pb-3 pt-3 flex items-center gap-4 rounded-b-lg bg-slate-700 border-t border-t-slate-600 border-b border-b-slate-900">
-            <EpisodePlayButton
-              episode={episode}
-              className="flex items-center gap-x-3 text-sm font-bold leading-6 text-purple-400 hover:text-orange-400"
-              playing={
-                <>
-                  <PauseIcon className="h-2.5 w-2.5 fill-current" />
-                  <span aria-hidden="true" className="text-md">Listen</span>
-                </>
-              }
-              paused={
-                <>
-                  <PlayIcon className="h-2.5 w-2.5 fill-current" />
-                  <span aria-hidden="true" className="text-md">Listen</span>
-                </>
-              }
-            />
-            <span
-              aria-hidden="true"
-              className="text-sm font-bold text-slate-400"
+            <h2
+              id={`episode-${episode.id}-title`}
+              className="mt-1 text-lg font-bold leading-snug text-slate-100 transition group-hover:text-white sm:text-xl"
             >
-              /
-            </span>
-            <Link
-              to={`/episodes/${episode.slug}`}
-              className="flex items-center text-sm font-bold leading-6 text-pink-500 hover:text-pink-700 active:text-pink-900"
-              aria-label={`Show notes for episode ${episode.title}`}
-            >
-              Show notes
-            </Link>
+              <Link to={`/episodes/${episode.slug}`} className="hover:text-brand-orange">
+                {episode.title}
+              </Link>
+            </h2>
           </div>
+          <span className="shrink-0 rounded-full bg-white/5 px-2.5 py-1 font-mono text-xs text-slate-400">
+            {episode.itunes_duration}
+          </span>
         </div>
-      </article>
-    </>
+
+        <p className="mt-3 line-clamp-2 leading-7 text-slate-400">{description}</p>
+
+        <div className="mt-5 flex items-center gap-5">
+          <EpisodePlayButton
+            episode={episode}
+            className="inline-flex items-center gap-x-2 rounded-full bg-brand-purple/15 px-4 py-1.5 text-sm font-semibold text-brand-purple transition hover:bg-brand-purple hover:text-white"
+            playing={
+              <>
+                <PauseIcon className="h-3 w-3 fill-current" />
+                <span>Pause</span>
+              </>
+            }
+            paused={
+              <>
+                <PlayIcon className="h-3 w-3 fill-current" />
+                <span>Listen</span>
+              </>
+            }
+          />
+          <Link
+            to={`/episodes/${episode.slug}`}
+            className="text-sm font-semibold text-slate-400 transition hover:text-brand-orange"
+            aria-label={`Show notes for episode ${episode.title}`}
+          >
+            Show notes →
+          </Link>
+        </div>
+      </div>
+    </article>
   )
 }

@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://planb.security/sitemap.xml
