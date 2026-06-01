@@ -1,0 +1,150 @@
+# planb.security static site (namespace: planb)
+# Hardened nginx (mirrors jumpstash); fronted by the Istio gateway. HTTP-01 ACME
+# challenges route per-host to a solver Service keyed on the stable adler32 domain
+# hash cert-manager labels its solver pods with.
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: planb
+  labels:
+    pod-security.kubernetes.io/enforce: baseline
+    pod-security.kubernetes.io/enforce-version: latest
+    pod-security.kubernetes.io/warn: restricted
+    pod-security.kubernetes.io/warn-version: latest
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: www
+  namespace: planb
+  labels: { app: www }
+spec:
+  replicas: 2
+  selector: { matchLabels: { app: www } }
+  template:
+    metadata:
+      labels: { app: www }
+      annotations: { sidecar.istio.io/inject: "false" }
+    spec:
+      automountServiceAccountToken: false
+      imagePullSecrets: [{ name: dockerhub-pull }]
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 101
+        runAsGroup: 101
+        fsGroup: 101
+        seccompProfile: { type: RuntimeDefault }
+      containers:
+        - name: nginx
+          image: loves2splug/planbsecurity-www
+          imagePullPolicy: Always
+          ports: [{ name: http, containerPort: 8080 }]
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities: { drop: ["ALL"] }
+          readinessProbe: { httpGet: { path: /healthz, port: http }, periodSeconds: 5 }
+          livenessProbe: { httpGet: { path: /healthz, port: http }, periodSeconds: 30 }
+          resources:
+            requests: { cpu: 10m, memory: 16Mi }
+            limits: { cpu: 100m, memory: 64Mi }
+          volumeMounts:
+            - { name: tmp, mountPath: /tmp }
+            - { name: nginx-cache, mountPath: /var/cache/nginx }
+      volumes:
+        - { name: tmp, emptyDir: {} }
+        - { name: nginx-cache, emptyDir: {} }
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: www
+  namespace: planb
+  labels: { app: www }
+spec:
+  selector: { app: www }
+  ports: [{ name: http, port: 80, targetPort: http }]
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: planb-tls
+  namespace: istio-system
+spec:
+  secretName: planb-tls
+  issuerRef: { kind: ClusterIssuer, name: letsencrypt-prod-http01 }
+  privateKey: { algorithm: ECDSA, size: 256, rotationPolicy: Always }
+  duration: 2160h
+  renewBefore: 360h
+  dnsNames:
+    - planb.security
+    - www.planb.security
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: acme-planb-security
+  namespace: istio-system
+  labels: { app.kubernetes.io/managed-by: qondom-sites }
+spec:
+  selector:
+    acme.cert-manager.io/http01-solver: "true"
+    acme.cert-manager.io/http-domain: "700188084"   # adler32("planb.security")
+  ports: [{ name: http, port: 8089, targetPort: 8089 }]
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: acme-www-planb-security
+  namespace: istio-system
+  labels: { app.kubernetes.io/managed-by: qondom-sites }
+spec:
+  selector:
+    acme.cert-manager.io/http01-solver: "true"
+    acme.cert-manager.io/http-domain: "1143408455"   # adler32("www.planb.security")
+  ports: [{ name: http, port: 8089, targetPort: 8089 }]
+---
+apiVersion: networking.istio.io/v1
+kind: Gateway
+metadata:
+  name: planb-gateway
+  namespace: istio-system
+spec:
+  selector: { istio: ingressgateway }
+  servers:
+    - port: { number: 80, name: http, protocol: HTTP }
+      hosts:
+        - planb.security
+        - www.planb.security
+    - port: { number: 443, name: https, protocol: HTTPS }
+      hosts:
+        - planb.security
+        - www.planb.security
+      tls: { mode: SIMPLE, credentialName: planb-tls, minProtocolVersion: TLSV1_2 }
+---
+apiVersion: networking.istio.io/v1
+kind: VirtualService
+metadata:
+  name: planb-www
+  namespace: planb
+spec:
+  hosts:
+    - planb.security
+    - www.planb.security
+  gateways: ["istio-system/planb-gateway"]
+  http:
+    - name: acme-planb-security
+      match: [{ port: 80, authority: { exact: "planb.security" }, uri: { prefix: /.well-known/acme-challenge/ } }]
+      route:
+        - destination: { host: acme-planb-security.istio-system.svc.cluster.local, port: { number: 8089 } }
+    - name: acme-www-planb-security
+      match: [{ port: 80, authority: { exact: "www.planb.security" }, uri: { prefix: /.well-known/acme-challenge/ } }]
+      route:
+        - destination: { host: acme-www-planb-security.istio-system.svc.cluster.local, port: { number: 8089 } }
+    - name: http
+      match: [{ port: 80 }]
+      route: [{ destination: { host: www.planb.svc.cluster.local, port: { number: 80 } } }]
+    - name: https
+      match: [{ port: 443 }]
+      route: [{ destination: { host: www.planb.svc.cluster.local, port: { number: 80 } } }]
