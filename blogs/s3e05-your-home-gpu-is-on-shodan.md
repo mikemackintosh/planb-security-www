@@ -35,7 +35,7 @@ There are four pieces, and each one is as small as we could make it:
 3. **llmgw.** This is a Go gateway of about 1,000 lines that runs on the Mini itself, and it is where IAAA actually happens: token verification, user provisioning, the enable/disable gate, prompt policy, and the accounting write.
 4. **The model server, unreachable.** The model server has no published port at all anymore. It exists only on a private Docker network, and the router forward to :30000 is gone. Even from inside our LAN, the only way to reach it is through the gateway.
 
-All of the code in this post lives in a companion repository, and it is small enough to read in a sitting.
+All of the code in this post lives in a companion repository at [rocketbox.ai/mike/iaaa-llm-gateway](https://rocketbox.ai/mike/iaaa-llm-gateway), and it is small enough to read in a sitting.
 
 ## The decisions, and why we made them
 
@@ -143,7 +143,7 @@ Putting an IdP in front of something does not make it safe by itself. OAuth depl
 
 **Scope creep.** Requested scopes are intersected with each client's registered allowlist at mint time, so a client cannot talk its way into scopes it was never granted. Purpose-built endpoints get purpose-built scopes: the metrics ingest endpoint accepts exactly one custom scope, and exactly one client is granted it.
 
-None of these protections are novel, and that is the point. They are the standard answers from the RFCs, and each one maps to a specific line of code or configuration in the companion repository that you can point at during a review.
+None of these protections are novel, and that is the point. They are the standard answers from the RFCs, and each one maps to a specific line of code or configuration in [the companion repository](https://rocketbox.ai/mike/iaaa-llm-gateway) that you can point at during a review.
 
 ## Worth understanding before you build this
 
@@ -181,4 +181,4 @@ None of this required exotic technology. It is the standard OAuth RFCs applied c
 
 ---
 
-*The gateway, edge guard, token helper, and deploy scripts described here are published as a companion repository, and the shape transfers to any stack: Ollama behind oauth2-proxy and Keycloak clears the same bar. Questions or war stories of your own: hello@planb.security.*
+*The gateway, edge guard, token helper, and deploy scripts described here are published at [rocketbox.ai/mike/iaaa-llm-gateway](https://rocketbox.ai/mike/iaaa-llm-gateway), and the shape transfers to any stack: Ollama behind oauth2-proxy and Keycloak clears the same bar. Questions or war stories of your own: hello@planb.security.*
