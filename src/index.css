@@ -1,7 +1,9 @@
-@import url('https://fonts.googleapis.com/css2?family=Days+One&family=Inter:wght@100;300;400;500;600;700;900&display=swap');
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* Fonts are linked from index.html with preconnect — an @import here would
+   block the stylesheet while the font CSS is fetched. */
 
 :root {
     color-scheme: dark;
@@ -17,16 +19,14 @@ body {
     min-height: 100vh;
     display: block;
 
-    font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
-    line-height: 1.5;
+    font-family: Chivo, "Helvetica Neue", Arial, sans-serif;
+    line-height: 1.6;
     font-weight: 400;
-    color: theme('colors.slate.200');
-    background-color: theme('colors.ink.950');
-    /* Subtle brand glows on a deep background instead of a full gradient wash. */
-    background-image:
-        radial-gradient(60rem 40rem at 75% -10%, rgba(137, 3, 255, 0.18), transparent 60%),
-        radial-gradient(50rem 40rem at 0% 10%, rgba(254, 156, 19, 0.10), transparent 55%);
-    background-attachment: fixed;
+    color: theme('colors.ink.DEFAULT');
+
+    /* Flat ground. The old radial purple/orange washes are gone — structure
+       is carried by hairline rules, not by bloom. */
+    background-color: theme('colors.ground');
 
     font-synthesis: none;
     text-rendering: optimizeLegibility;
@@ -36,6 +36,25 @@ body {
 }
 
 ::selection {
-    background-color: rgba(137, 3, 255, 0.4);
+    background-color: theme('colors.brand.purple');
     color: #fff;
+}
+
+:focus-visible {
+    outline: 2px solid theme('colors.brand.violet');
+    outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+    html {
+        scroll-behavior: auto;
+    }
+
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        transition-duration: 0.01ms !important;
+    }
 }

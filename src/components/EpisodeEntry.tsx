@@ -4,61 +4,77 @@ import { FormattedDate } from '../FormattedDate'
 import { EpisodePlayButton } from '../EpisodePlayButton'
 import { PauseIcon } from '../PauseIcon'
 import { PlayIcon } from '../PlayIcon'
+import { articleMetaForEpisode, seasonEpisode } from '../blog'
 
 export function EpisodeEntry({ episode }: { episode: Episode }) {
-  let date = new Date(episode.published)
-  let description = episode.description.replace(/<\/?p>/g, '').trim()
+  const date = new Date(episode.published)
+  const description = episode.description.replace(/<\/?p>/g, '').trim()
+  const article = articleMetaForEpisode(episode)
+  const se = seasonEpisode(episode)
 
   return (
-    <article aria-labelledby={`episode-${episode.id}-title`} className="py-6">
-      <div className="group rounded-2xl border border-white/5 bg-ink-800/60 p-5 transition hover:border-brand-purple/40 hover:bg-ink-800 sm:p-6">
-        <div className="flex items-start justify-between gap-4">
-          <div className="min-w-0">
-            <FormattedDate
-              date={date}
-              className="font-mono text-xs uppercase tracking-wide text-slate-500"
-            />
-            <h2
-              id={`episode-${episode.id}-title`}
-              className="mt-1 text-lg font-bold leading-snug text-slate-100 transition group-hover:text-white sm:text-xl"
-            >
-              <Link to={`/episodes/${episode.slug}`} className="hover:text-brand-orange">
-                {episode.title}
-              </Link>
-            </h2>
-          </div>
-          <span className="shrink-0 rounded-full bg-white/5 px-2.5 py-1 font-mono text-xs text-slate-400">
-            {episode.itunes_duration}
-          </span>
-        </div>
+    // Full-bleed hover with a 2px accent bar sliding in from the left — the one
+    // hover motion in the system, reused on every list row across the site.
+    <article
+      aria-labelledby={`episode-${episode.id}-title`}
+      className="group relative border-b border-rule px-4 py-6 transition-colors hover:bg-surface sm:px-6
+                 before:absolute before:inset-y-0 before:left-0 before:w-0.5 before:origin-top before:scale-y-0
+                 before:bg-brand-purple before:transition-transform before:duration-200 before:content-['']
+                 hover:before:scale-y-100"
+    >
+      <div className="flex items-start justify-between gap-5 font-mono text-[11px] uppercase tracking-[0.12em] text-ink-faint">
+        <span>
+          <FormattedDate date={date} short />
+          {se && ` · S${se[0]}E${se[1]}`}
+        </span>
+        <span className="shrink-0 tabular-nums">{episode.itunes_duration}</span>
+      </div>
 
-        <p className="mt-3 line-clamp-2 leading-7 text-slate-400">{description}</p>
+      <h2
+        id={`episode-${episode.id}-title`}
+        className="mt-2.5 font-headline text-xl font-bold leading-[1.25] tracking-[-0.012em] text-ink sm:text-[21px]"
+      >
+        <Link to={`/episodes/${episode.slug}`} className="transition group-hover:text-brand-violet">
+          {episode.title}
+        </Link>
+      </h2>
 
-        <div className="mt-5 flex items-center gap-5">
-          <EpisodePlayButton
-            episode={episode}
-            className="inline-flex items-center gap-x-2 rounded-full bg-brand-purple/15 px-4 py-1.5 text-sm font-semibold text-brand-purple transition hover:bg-brand-purple hover:text-white"
-            playing={
-              <>
-                <PauseIcon className="h-3 w-3 fill-current" />
-                <span>Pause</span>
-              </>
-            }
-            paused={
-              <>
-                <PlayIcon className="h-3 w-3 fill-current" />
-                <span>Listen</span>
-              </>
-            }
-          />
+      <p className="mt-2 line-clamp-2 max-w-[78ch] text-[15px] leading-[1.65] text-ink-dim">
+        {description}
+      </p>
+
+      <div className="mt-4 flex flex-wrap items-center gap-3">
+        <EpisodePlayButton
+          episode={episode}
+          className="inline-flex items-center gap-2 rounded-control border border-rule-strong px-3.5 py-2 font-mono text-[11px] font-bold uppercase tracking-[0.14em] text-ink transition hover:border-brand-purple hover:bg-brand-purple hover:text-white"
+          playing={
+            <>
+              <PauseIcon className="h-3 w-3 fill-current" />
+              <span>Pause</span>
+            </>
+          }
+          paused={
+            <>
+              <PlayIcon className="h-3 w-3 fill-current" />
+              <span>Listen</span>
+            </>
+          }
+        />
+        <Link
+          to={`/episodes/${episode.slug}`}
+          className="px-3 py-2 font-mono text-[11px] font-medium uppercase tracking-[0.14em] text-ink-faint transition hover:text-ink"
+          aria-label={`Show notes for episode ${episode.title}`}
+        >
+          Show notes →
+        </Link>
+        {article && (
           <Link
-            to={`/episodes/${episode.slug}`}
-            className="text-sm font-semibold text-slate-400 transition hover:text-brand-orange"
-            aria-label={`Show notes for episode ${episode.title}`}
+            to={`/blog/${article.slug}`}
+            className="px-3 py-2 font-mono text-[11px] font-medium uppercase tracking-[0.14em] text-ink-faint transition hover:text-ink"
           >
-            Show notes →
+            Read the article →
           </Link>
-        </div>
+        )}
       </div>
     </article>
   )

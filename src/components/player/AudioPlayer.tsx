@@ -42,14 +42,14 @@ export function AudioPlayer() {
   }
 
   return (
-    <div className="flex items-center gap-6 border-t border-white/10 bg-ink-900/90 px-4 py-4 shadow-glow backdrop-blur-lg md:px-6">
+    <div className="flex items-center gap-6 border-t border-rule-strong bg-surface/95 px-4 py-4 backdrop-blur md:px-6">
       <div className="hidden md:block">
         <PlayButton player={player} />
       </div>
       <div className="mb-[env(safe-area-inset-bottom)] flex flex-1 flex-col gap-3 overflow-hidden p-1">
         <a
           href={`/episodes/${player.episode.slug}`}
-          className="truncate text-center text-sm font-bold leading-6 text-slate-200 transition hover:text-brand-orange md:text-left"
+          className="truncate text-center font-headline text-sm font-bold leading-6 text-ink transition hover:text-brand-violet md:text-left"
           title={player.episode.title}
         >
           {player.episode.title}

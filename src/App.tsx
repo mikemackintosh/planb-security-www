@@ -48,48 +48,69 @@ function LegacyRedirect({ episodes }: { episodes: Episode[] }) {
   return <Navigate to="/" replace />
 }
 
+/** Lockup B — cut block + stacked wordmark. Square: a rounded mark was the
+ *  app-icon cliché we removed. Bebas is caps-only, so "PlanB" sets as PLANB. */
+function Wordmark() {
+  return (
+    <span className="flex items-stretch gap-2.5">
+      <span className="grid w-[34px] shrink-0 place-items-center bg-brand-purple pt-0.5 font-display text-2xl leading-none text-white">
+        B
+      </span>
+      <span className="flex flex-col justify-center">
+        <span className="font-display text-2xl leading-[0.9] tracking-wide text-ink transition group-hover:text-brand-violet">
+          PlanB
+        </span>
+        <span className="mt-[2px] font-mono text-[9px] font-medium tracking-[0.34em] text-ink-dim">
+          SECURITY
+        </span>
+      </span>
+    </span>
+  )
+}
+
 function Navbar() {
   const latest = episodes[0]
   return (
-    <header className="sticky top-0 z-30 border-b border-white/5 bg-ink-950/70 backdrop-blur-lg">
-      <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-3 sm:px-6">
-        <Link to="/" className="group flex items-center gap-2 shrink-0">
-          <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-brand-gradient font-display text-sm text-white shadow-glow">
-            B
-          </span>
-          <span className="font-display text-lg tracking-tight text-white transition group-hover:text-brand-orange">
-            PlanB<span className="text-brand-purple group-hover:text-brand-orange"> Security</span>
-          </span>
+    <header className="sticky top-0 z-30 border-b border-rule bg-ground/90 backdrop-blur">
+      <div className="mx-auto flex max-w-6xl items-center justify-between gap-6 px-4 py-3 sm:px-6">
+        <Link to="/" className="group shrink-0">
+          <Wordmark />
         </Link>
 
+        {/* Station-ID strip: a hard amber flag butted against the title. This is
+            the one place amber reads as "live" rather than as diagram data. */}
         {latest && (
           <Link
             to={`/episodes/${latest.slug}`}
-            className="hidden min-w-0 flex-1 items-center justify-center sm:flex"
+            className="group hidden min-w-0 flex-1 justify-center lg:flex"
           >
-            <span className="group inline-flex max-w-full items-center gap-2 rounded-full border border-white/10 bg-white/5 py-1 pl-2 pr-3 text-sm text-slate-300 transition hover:border-brand-purple/50 hover:bg-white/10">
-              <span className="rounded-full bg-brand-gradient px-2 py-0.5 text-xs font-bold text-white">New</span>
-              <span className="truncate font-medium transition group-hover:text-white">{latest.title}</span>
+            <span className="inline-flex max-w-full items-stretch overflow-hidden rounded-control border border-rule transition group-hover:border-rule-strong">
+              <span className="grid shrink-0 place-items-center bg-brand-amber px-2 font-mono text-[9px] font-bold tracking-[0.16em] text-[#17120A]">
+                NEW
+              </span>
+              <span className="grid items-center truncate px-3 py-1.5 text-[13px] font-medium text-ink-dim transition group-hover:text-ink">
+                {latest.title}
+              </span>
             </span>
           </Link>
         )}
 
-        <div className="flex shrink-0 items-center gap-5">
-          <Link
-            to="/blog"
-            className="text-sm font-medium text-slate-300 transition hover:text-brand-orange"
-          >
-            Blog
+        <nav className="flex shrink-0 items-center gap-6 font-mono text-[11px] font-medium uppercase tracking-[0.14em] text-ink-dim">
+          <Link to="/" className="transition hover:text-ink">
+            Episodes
+          </Link>
+          <Link to="/blog" className="transition hover:text-ink">
+            Writing
           </Link>
           <a
             href="https://x.com/mikemackintosh"
             target="_blank"
             rel="noopener noreferrer"
-            className="hidden whitespace-nowrap text-sm text-slate-400 transition hover:text-white md:block"
+            className="hidden whitespace-nowrap transition hover:text-ink md:block"
           >
-            Hosted by <span className="font-semibold text-slate-200">@mikemackintosh</span>
+            @mikemackintosh
           </a>
-        </div>
+        </nav>
       </div>
     </header>
   )
@@ -98,27 +119,36 @@ function Navbar() {
 function Footer() {
   const year = new Date().getFullYear()
   return (
-    <footer className="mt-20 border-t border-white/5">
-      <div className="mx-auto max-w-6xl px-6 py-14">
-        <div className="flex flex-col items-center gap-8">
-          <span className="font-display text-xl text-white">PlanB Security</span>
-          <div className="flex flex-wrap justify-center gap-x-8 gap-y-4">
+    <footer className="mt-24 border-t border-rule">
+      <div className="mx-auto max-w-6xl px-4 py-12 sm:px-6">
+        <div className="flex flex-col gap-8 sm:flex-row sm:items-start sm:justify-between">
+          <div>
+            <Wordmark />
+            <p className="mt-4 max-w-sm text-sm leading-relaxed text-ink-faint">
+              All things #InfoSec, for when things go wrong. A weekly podcast and a written
+              companion for every episode.
+            </p>
+          </div>
+
+          <div className="flex flex-wrap gap-x-5 gap-y-4">
             {social.map((item) => (
               <a
                 key={item.name}
                 href={item.href}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-slate-500 transition hover:text-brand-orange"
+                className="text-ink-faint transition hover:text-brand-violet"
               >
                 <span className="sr-only">{item.name}</span>
-                <item.icon className="h-6 w-6" aria-hidden="true" />
+                <item.icon className="h-5 w-5" aria-hidden="true" />
               </a>
             ))}
           </div>
-          <p className="text-center text-xs leading-5 text-slate-500">
-            &copy; {year} Mike Mackintosh. All rights reserved.
-          </p>
+        </div>
+
+        <div className="mt-10 flex flex-col gap-2 border-t border-rule pt-6 font-mono text-[10px] uppercase tracking-[0.14em] text-ink-faint sm:flex-row sm:justify-between">
+          <span>&copy; {year} Mike Mackintosh</span>
+          <span>All rights reserved</span>
         </div>
       </div>
     </footer>
@@ -135,8 +165,8 @@ function App() {
           <Navbar />
 
           {/* Main content */}
-          <main className="isolate pb-32">
-            <Suspense fallback={<div className="px-6 py-20 text-center text-slate-500">Loading…</div>}>
+          <main className="isolate pb-24">
+            <Suspense fallback={<div className="px-6 py-20 text-center font-mono text-xs uppercase tracking-[0.14em] text-ink-faint">Loading…</div>}>
               <Routes>
                 <Route path="/" element={<HomePage episodes={episodes} />} />
                 <Route path="/episodes/:slug" element={<EpisodePage episodes={episodes} />} />

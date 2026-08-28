@@ -6,7 +6,7 @@ import { EpisodePlayButton } from '../EpisodePlayButton'
 import { PauseIcon } from '../PauseIcon'
 import { PlayIcon } from '../PlayIcon'
 import { useMeta } from '../useMeta'
-import { articleMetaForEpisode } from '../blog'
+import { articleMetaForEpisode, seasonEpisode } from '../blog'
 
 interface EpisodePageProps {
   episodes: Episode[]
@@ -20,7 +20,7 @@ function plainText(html: string, max = 200) {
 export function EpisodePage({ episodes }: EpisodePageProps) {
   const { slug } = useParams<{ slug: string }>()
 
-  const episodeIndex = episodes.findIndex(ep => ep.slug === slug)
+  const episodeIndex = episodes.findIndex((ep) => ep.slug === slug)
   const episode = episodes[episodeIndex]
 
   // Hooks must run before any early return; guard with optional values.
@@ -42,110 +42,110 @@ export function EpisodePage({ episodes }: EpisodePageProps) {
 
   const safeHtml = DOMPurify.sanitize(html, { ADD_ATTR: ['target', 'rel'] })
   const article = articleMetaForEpisode(episode)
+  const se = seasonEpisode(episode)
 
   return (
-    <div className="mx-auto max-w-4xl px-4 py-10 sm:px-6 lg:px-8">
-      {/* Back link */}
+    <div className="mx-auto max-w-4xl px-4 py-10 sm:px-6">
       <Link
         to="/"
-        className="inline-flex items-center text-sm font-medium text-slate-400 transition hover:text-brand-orange"
+        className="font-mono text-[11px] font-medium uppercase tracking-[0.14em] text-ink-faint transition hover:text-ink"
       >
-        <svg className="mr-2 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-        </svg>
-        Back to Episodes
+        ← All episodes
       </Link>
 
-      {/* Episode header */}
-      <article className="mt-8 overflow-hidden rounded-2xl border border-white/5 bg-ink-800/60">
-        <div className="border-b border-white/5 bg-brand-purple/5 p-6 sm:p-8">
-          <FormattedDate
-            date={new Date(episode.published)}
-            className="font-mono text-sm text-brand-orange"
-          />
-          <h1 className="mt-2 font-display text-2xl leading-tight text-white sm:text-4xl">
-            {episode.title}
-          </h1>
-          <div className="mt-4 flex flex-wrap items-center gap-4">
-            <EpisodePlayButton
-              episode={episode}
-              className="inline-flex items-center gap-x-3 rounded-full bg-brand-gradient px-6 py-3 text-base font-bold text-white shadow-glow transition hover:opacity-90"
-              playing={
-                <>
-                  <PauseIcon className="h-5 w-5 fill-current" />
-                  <span>Pause Episode</span>
-                </>
-              }
-              paused={
-                <>
-                  <PlayIcon className="h-5 w-5 fill-current" />
-                  <span>Play Episode</span>
-                </>
-              }
-            />
-            <span className="font-mono text-sm text-slate-400">{episode.itunes_duration}</span>
+      <article className="mt-10">
+        <header className="grid gap-7 border-b border-rule-strong pb-8 md:grid-cols-[5.5rem_minmax(0,1fr)]">
+          {se && (
+            <div className="font-display text-[2.75rem] leading-[0.8] tracking-[0.01em] text-brand-violet">
+              S{se[0]}
+              <br className="hidden md:block" />
+              <span className="md:hidden">·</span>E{String(se[1]).padStart(2, '0')}
+              <span className="mt-2.5 block font-mono text-[9px] font-medium tracking-[0.16em] text-ink-faint">
+                SEASON / EP
+              </span>
+            </div>
+          )}
+
+          <div className={se ? '' : 'md:col-span-2'}>
+            <h1 className="font-headline text-[clamp(1.75rem,4vw,2.75rem)] font-bold leading-[1.08] tracking-[-0.024em] text-ink [text-wrap:balance]">
+              {episode.title}
+            </h1>
+            <div className="mt-5 flex flex-wrap gap-x-5 gap-y-2 font-mono text-[11px] uppercase tracking-[0.12em] text-ink-faint">
+              <FormattedDate date={new Date(episode.published)} short />
+              <span className="tabular-nums">{episode.itunes_duration}</span>
+            </div>
+
+            <div className="mt-6 flex flex-wrap items-center gap-3">
+              <EpisodePlayButton
+                episode={episode}
+                className="inline-flex items-center gap-2 rounded-control border border-rule-strong px-4 py-2.5 font-mono text-[11px] font-bold uppercase tracking-[0.14em] text-ink transition hover:border-brand-purple hover:bg-brand-purple hover:text-white"
+                playing={
+                  <>
+                    <PauseIcon className="h-3 w-3 fill-current" />
+                    <span>Pause episode</span>
+                  </>
+                }
+                paused={
+                  <>
+                    <PlayIcon className="h-3 w-3 fill-current" />
+                    <span>Play episode</span>
+                  </>
+                }
+              />
+              {article && (
+                <Link
+                  to={`/blog/${article.slug}`}
+                  className="px-3 py-2.5 font-mono text-[11px] font-medium uppercase tracking-[0.14em] text-ink-faint transition hover:text-ink"
+                >
+                  Read the essay →
+                </Link>
+              )}
+            </div>
           </div>
-          {article && (
-            <Link
-              to={`/blog/${article.slug}`}
-              className="mt-4 inline-flex items-center gap-2 text-sm font-semibold text-slate-300 transition hover:text-brand-orange"
-            >
-              📖 Read the companion article
-              <span aria-hidden="true">→</span>
+        </header>
+
+        <section className="mt-10">
+          <h2 className="font-mono text-[11px] font-medium uppercase tracking-[0.16em] text-ink-faint">
+            Show notes
+          </h2>
+          <div
+            className="prose prose-invert prose-bulletin mt-5 max-w-[70ch]"
+            dangerouslySetInnerHTML={{ __html: safeHtml }}
+          />
+        </section>
+      </article>
+
+      <nav className="mt-14 grid gap-px border-t border-rule-strong bg-rule sm:grid-cols-2">
+        <div className="bg-ground p-5 sm:p-6">
+          <span className="font-mono text-[10px] uppercase tracking-[0.16em] text-ink-faint">
+            Previous episode
+          </span>
+          {previousEpisode ? (
+            <Link to={`/episodes/${previousEpisode.slug}`} className="group mt-2 block">
+              <p className="line-clamp-2 font-headline font-semibold leading-snug text-ink transition group-hover:text-brand-violet">
+                {previousEpisode.title}
+              </p>
             </Link>
+          ) : (
+            <p className="mt-2 text-sm text-ink-faint">Nothing older — this is the first.</p>
           )}
         </div>
 
-        {/* Episode content */}
-        <div className="p-6 sm:p-8">
-          <h2 className="mb-4 text-sm font-semibold uppercase tracking-wide text-slate-500">
-            About this episode
-          </h2>
-          <div
-            className="prose prose-invert prose-slate max-w-none prose-a:text-brand-orange prose-headings:font-display"
-            dangerouslySetInnerHTML={{ __html: safeHtml }}
-          />
+        <div className="bg-ground p-5 sm:p-6 sm:text-right">
+          <span className="font-mono text-[10px] uppercase tracking-[0.16em] text-ink-faint">
+            Next episode
+          </span>
+          {nextEpisode ? (
+            <Link to={`/episodes/${nextEpisode.slug}`} className="group mt-2 block">
+              <p className="line-clamp-2 font-headline font-semibold leading-snug text-ink transition group-hover:text-brand-violet">
+                {nextEpisode.title}
+              </p>
+            </Link>
+          ) : (
+            <p className="mt-2 text-sm text-ink-faint">You&apos;re on the latest.</p>
+          )}
         </div>
-
-        {/* Previous/Next navigation */}
-        <div className="grid grid-cols-2 divide-x divide-white/5 border-t border-white/5 bg-ink-900/50">
-          <div className="p-4 sm:p-6">
-            {previousEpisode ? (
-              <Link to={`/episodes/${previousEpisode.slug}`} className="group block">
-                <span className="text-xs font-medium uppercase tracking-wide text-slate-500">
-                  Previous Episode
-                </span>
-                <p className="mt-1 line-clamp-2 text-sm font-medium text-slate-300 transition group-hover:text-brand-orange">
-                  {previousEpisode.title}
-                </p>
-              </Link>
-            ) : (
-              <div className="text-slate-600">
-                <span className="text-xs font-medium uppercase tracking-wide">Previous Episode</span>
-                <p className="mt-1 text-sm">No previous episode</p>
-              </div>
-            )}
-          </div>
-
-          <div className="p-4 text-right sm:p-6">
-            {nextEpisode ? (
-              <Link to={`/episodes/${nextEpisode.slug}`} className="group block">
-                <span className="text-xs font-medium uppercase tracking-wide text-slate-500">
-                  Next Episode
-                </span>
-                <p className="mt-1 line-clamp-2 text-sm font-medium text-slate-300 transition group-hover:text-brand-orange">
-                  {nextEpisode.title}
-                </p>
-              </Link>
-            ) : (
-              <div className="text-slate-600">
-                <span className="text-xs font-medium uppercase tracking-wide">Next Episode</span>
-                <p className="mt-1 text-sm">You&apos;re on the latest!</p>
-              </div>
-            )}
-          </div>
-        </div>
-      </article>
+      </nav>
     </div>
   )
 }
