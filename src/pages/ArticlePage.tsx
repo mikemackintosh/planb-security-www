@@ -189,7 +189,8 @@ export function ArticlePage({ episodes }: ArticlePageProps) {
         <Link
           to={`/blog/${next.slug}`}
           className="group relative mt-14 grid grid-cols-[3.5rem_minmax(0,1fr)] items-baseline gap-x-5 gap-y-1
-                     border-t border-rule-strong py-4 pl-4 transition-colors hover:bg-surface
+                     -mx-4 border-t border-rule-strong px-4 py-4 transition-colors
+                     hover:bg-surface sm:-mx-6 sm:px-6
                      md:grid-cols-[3.25rem_7.5rem_minmax(0,1fr)_4.5rem]
                      before:absolute before:inset-y-0 before:left-0 before:w-0.5 before:origin-center
                      before:scale-y-0 before:bg-brand-purple before:transition-transform

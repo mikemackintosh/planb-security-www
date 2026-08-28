@@ -7,6 +7,12 @@ const RULE = 'rgba(237, 235, 240, 0.11)'
 const RULE_STRONG = 'rgba(237, 235, 240, 0.22)'
 const PROSE = '#D7D4DD'
 
+// Two axis gradients intersected, so every edge dissolves into the ground.
+const EDGE_FADE = [
+    'linear-gradient(to right, transparent 0%, #000 3%, #000 97%, transparent 100%)',
+    'linear-gradient(to bottom, transparent 0%, #000 3%, #000 97%, transparent 100%)',
+].join(', ')
+
 export default {
     content: [
         "./index.html",
@@ -121,7 +127,19 @@ export default {
                         },
                         // Inline article diagrams keep their own hardcoded palette.
                         svg: { display: 'block', width: '100%', height: 'auto' },
-                        img: { display: 'block', width: '100%', height: 'auto', border: `1px solid ${RULE}` },
+                        // Article art is composed on black, the same ground the
+                        // page uses, so a hard edge reads as a pasted-in box.
+                        // Fade all four edges instead of framing them.
+                        img: {
+                            display: 'block',
+                            width: '100%',
+                            height: 'auto',
+                            border: 'none',
+                            maskImage: EDGE_FADE,
+                            WebkitMaskImage: EDGE_FADE,
+                            maskComposite: 'intersect',
+                            WebkitMaskComposite: 'source-in',
+                        },
                         figure: { marginTop: '2.25rem', marginBottom: '2.25rem' },
                         figcaption: {
                             fontFamily: '"JetBrains Mono", ui-monospace, monospace',

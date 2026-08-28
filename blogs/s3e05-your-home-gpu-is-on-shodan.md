@@ -8,27 +8,16 @@
 
 ## How this started
 
-We run a local LLM on a Mac Mini in the house, served over an OpenAI-compatible API, and we wanted to reach it away from home. The path of least resistance is one router rule:
-
-```
-internet -> router:30000 -> mac-mini:30000 -> model server
-```
-
-That is the setup most people land on, because Ollama, vLLM, and SGLang all default to listening and serving, and Shodan will show you thousands of instances running exactly this way, with no TLS, no authentication, and no record of who called. Anyone who finds the port gets free compute, and every prompt and completion crosses the internet in plaintext.
+We run a local LLM on a Mac Mini in the house, served over an OpenAI-compatible API, and we wanted to reach it away from home. The path of least resistance is one router rule — `internet -> router:30000 -> mac-mini:30000 -> model server`. That is the setup most people land on, because Ollama, vLLM, and SGLang all default to listening and serving, and Shodan will show you thousands of instances running exactly this way, with no TLS, no authentication, and no record of who called. Anyone who finds the port gets free compute, and every prompt and completion crosses the internet in plaintext.
 
 We knew that going in, and we were not willing to put the machine on the internet under those terms. So before the model took any traffic from outside the LAN, we set a requirement: every request to the model has to clear **IAAA**, meaning **I**dentity (who is this?), **A**uthentication (prove it), **A**uthorization (are they allowed?), and **A**ccounting (write it all down), and the machine should have no route from the internet except through something that enforces all four. This post is about the system that requirement produced.
 
 ## What we built
 
-```
-                   +- cloud ----------------+   +- home -------------------------+
-caller --TLS-->    |  edge guard (k8s)      |   |  Caddy --> llmgw --> model     |
-llmgw.example.com  |  . verifies JWT        |-->|  (TLS)     (IAAA)    (no port) |
-                   |  . audience allowlist  |   |                                |
-                   |  . stamps X-Edge-Token |   +--------------------------------+
-                   +------------------------+
-tokens from an OIDC authorization server (ours; any spec-correct AS works)
-```
+<figure>
+<img src="/img/s3e05-your-home-gpu-is-on-shodan.webp" width="1672" height="941" loading="lazy" decoding="async" alt="Diagram: what happens on every request. Eight stages run left to right — a user or app request, identify the requester, authenticate, authorize, then an allow-or-deny decision. Allow continues to account and audit, forward to the local LLM API, the model server, and finally the response. Deny blocks access. Callouts note that there is no anonymous access, policy is evaluated before model access, every request carries per-user accountability, and every request leaves a trail. A band underneath traces the full chain: identity, authentication, authorization, accounting." />
+<figcaption>Every request clears identity, authentication, authorization and accounting before the model sees it — a denial never reaches the model server at all.</figcaption>
+</figure>
 
 There are four pieces, and each one is as small as we could make it:
 
