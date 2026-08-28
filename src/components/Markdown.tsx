@@ -33,7 +33,7 @@ export function headingSlug(text: string): string {
 export function Markdown({ children, className = '' }: { children: string; className?: string }) {
   const html = useMemo(() => {
     const rendered = marked.parse(emDashes(children), { async: false }) as string
-    const clean = DOMPurify.sanitize(rendered, { ADD_ATTR: ['target', 'rel'] })
+    const clean = DOMPurify.sanitize(rendered, { ADD_ATTR: ['target', 'rel', 'loading', 'decoding'] })
 
     // Anchor ids are injected after sanitizing, from a slug we derive ourselves,
     // so the TOC rail can link into sections without trusting authored HTML.

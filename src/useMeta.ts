@@ -8,7 +8,11 @@ interface Meta {
   description?: string
   /** Canonical/OG url path or absolute URL, e.g. `/episodes/foo`. */
   url?: string
+  /** Social card image path, e.g. `/img/foo-og.jpg`. Falls back to the site default. */
+  image?: string
 }
+
+const DEFAULT_IMAGE = '/img/home-studio-og.jpg'
 
 function setTag(selector: string, attr: 'content', value: string) {
   const el = document.head.querySelector<HTMLMetaElement>(selector)
@@ -20,7 +24,7 @@ function setTag(selector: string, attr: 'content', value: string) {
  * already exist in index.html. Keeps SPA route changes in sync for crawlers
  * that execute JS and for nicer browser-tab/share behaviour.
  */
-export function useMeta({ title, description, url }: Meta) {
+export function useMeta({ title, description, url, image }: Meta) {
   useEffect(() => {
     const fullTitle = title ? `${title} — ${SITE_NAME}` : DEFAULT_TITLE
     document.title = fullTitle
@@ -33,6 +37,13 @@ export function useMeta({ title, description, url }: Meta) {
       setTag('meta[name="twitter:description"]', 'content', description)
     }
 
+    // Social crawlers want an absolute URL, and most of them will not follow a
+    // relative one. Always emit something rather than leaving the build default.
+    const img = image || DEFAULT_IMAGE
+    const absImage = img.startsWith('http') ? img : `https://planb.security${img}`
+    setTag('meta[property="og:image"]', 'content', absImage)
+    setTag('meta[name="twitter:image"]', 'content', absImage)
+
     if (url) {
       const abs = url.startsWith('http') ? url : `https://planb.security${url}`
       setTag('meta[property="og:url"]', 'content', abs)
@@ -44,5 +55,5 @@ export function useMeta({ title, description, url }: Meta) {
       // Restore the default title on unmount so stale episode titles don't linger.
       document.title = DEFAULT_TITLE
     }
-  }, [title, description, url])
+  }, [title, description, url, image])
 }

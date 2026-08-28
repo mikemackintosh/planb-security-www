@@ -121,6 +121,16 @@ export default {
                         },
                         // Inline article diagrams keep their own hardcoded palette.
                         svg: { display: 'block', width: '100%', height: 'auto' },
+                        img: { display: 'block', width: '100%', height: 'auto', border: `1px solid ${RULE}` },
+                        figure: { marginTop: '2.25rem', marginBottom: '2.25rem' },
+                        figcaption: {
+                            fontFamily: '"JetBrains Mono", ui-monospace, monospace',
+                            fontSize: '0.6875rem',
+                            lineHeight: '1.6',
+                            letterSpacing: '0.04em',
+                            color: '#6E6A79',
+                            marginTop: '0.75rem',
+                        },
                     },
                 },
             }),

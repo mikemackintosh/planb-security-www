@@ -45,7 +45,7 @@ export function HomePage({ episodes }: HomePageProps) {
           url: SITE_URL,
           description:
             'A podcast about all things InfoSec — new laws, threats, tooling and ways of thinking to help you build a strong security program.',
-          image: `${SITE_URL}/logo.png`,
+          image: `${SITE_URL}/img/home-studio-og.jpg`,
           webFeed: 'https://anchor.fm/s/e741494c/podcast/rss',
           numberOfEpisodes: episodes.length,
           author: AUTHOR,
@@ -59,8 +59,33 @@ export function HomePage({ episodes }: HomePageProps) {
       />
 
       {/* Hero — the thesis lands on two words, not a gradient. */}
-      <section className="mx-auto max-w-6xl px-4 pt-14 sm:px-6 sm:pt-20">
-        <div className="animate-fade-up">
+      <section className="relative overflow-hidden">
+        {/* Decorative: the art bleeds off the right edge and is masked away
+            before it reaches the headline, so it reads as depth behind the
+            type rather than a picture next to it. Desktop only — behind the
+            type at narrow widths it would just cost legibility. */}
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-y-0 right-0 hidden w-[52%] items-center lg:flex"
+        >
+          {/* object-contain, not cover: the art is 4:3 inside a portrait
+              container, so cover scales to fill the height and crops the
+              right-hand panels off past the viewport edge. */}
+          <img
+            src="/img/home-studio.webp"
+            width={1448}
+            height={1086}
+            alt=""
+            decoding="async"
+            className="h-auto max-h-full w-full object-contain opacity-80
+                       [-webkit-mask-image:linear-gradient(to_right,transparent_0%,#000_34%)]
+                       [mask-image:linear-gradient(to_right,transparent_0%,#000_34%)]"
+          />
+          <div className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-ground to-transparent" />
+        </div>
+
+        <div className="relative mx-auto max-w-6xl px-4 pt-14 sm:px-6 sm:pt-20">
+          <div className="animate-fade-up">
           <div className="flex items-center gap-4 font-mono text-[11px] font-medium uppercase tracking-[0.2em] text-ink-faint">
             <span>The InfoSec Podcast</span>
             <span className="h-px flex-1 bg-rule" />
@@ -113,6 +138,7 @@ export function HomePage({ episodes }: HomePageProps) {
               </div>
             ))}
           </dl>
+        </div>
         </div>
       </section>
 

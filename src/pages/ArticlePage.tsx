@@ -73,6 +73,7 @@ export function ArticlePage({ episodes }: ArticlePageProps) {
     title: article?.seoTitle,
     description: article?.deck || undefined,
     url: article ? `/blog/${article.slug}` : undefined,
+    image: article?.ogImage || undefined,
   })
 
   if (!article) {
@@ -102,7 +103,7 @@ export function ArticlePage({ episodes }: ArticlePageProps) {
           dateModified: published,
           timeRequired: `PT${article.minutes}M`,
           articleSection: `Season ${article.season}`,
-          image: `${SITE_URL}/logo.png`,
+          image: `${SITE_URL}${article.ogImage ?? '/logo.png'}`,
           author: AUTHOR,
           publisher: PUBLISHER,
         }}
