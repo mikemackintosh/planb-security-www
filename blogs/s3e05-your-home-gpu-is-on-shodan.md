@@ -1,4 +1,4 @@
-# Your Home GPU Is on Shodan -- Putting IAAA in Front of a Self-Hosted LLM
+# Your Home GPU Is on Shodan: How to Secure a Self-Hosted LLM
 
 ## How we put a local LLM on the internet without exposing it, with identity, authentication, authorization, and accounting on every request
 

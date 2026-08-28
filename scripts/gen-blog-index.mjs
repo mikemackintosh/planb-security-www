@@ -31,14 +31,18 @@ function readingMinutes(raw) {
   return Math.max(1, Math.round(words / 225))
 }
 
+// Authors type ` -- ` as a subtitle separator; it must render as an em dash,
+// not a literal double hyphen.
+const emDash = (s) => s.replace(/ -- /g, ' \u2014 ')
+
 const files = readdirSync(blogsDir).filter((f) => f.endsWith('.md')).sort()
 
 const metas = files.map((file) => {
   const raw = readFileSync(join(blogsDir, file), 'utf8')
   const slug = file.replace(/\.md$/, '')
   const [season, episode] = seasonEpisode(slug)
-  const title = (raw.match(/^#\s+(.+)$/m)?.[1] ?? slug).trim()
-  const deck = (raw.match(/^##\s+(.+)$/m)?.[1] ?? '').trim()
+  const title = emDash((raw.match(/^#\s+(.+)$/m)?.[1] ?? slug).trim())
+  const deck = emDash((raw.match(/^##\s+(.+)$/m)?.[1] ?? '').trim())
   return { slug, season, episode, title, deck, minutes: readingMinutes(raw) }
 })
 
