@@ -5,9 +5,10 @@
   "type": "module",
   "scripts": {
     "gen:blog": "node scripts/gen-blog-index.mjs",
+    "gen:sitemap": "node scripts/gen-sitemap.mjs",
     "predev": "node scripts/gen-blog-index.mjs",
     "dev": "vite",
-    "prebuild": "node scripts/gen-blog-index.mjs",
+    "prebuild": "node scripts/gen-blog-index.mjs && node scripts/gen-sitemap.mjs",
     "build": "vite build",
     "lint": "eslint . --ext js,jsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview"

@@ -25,3 +25,6 @@ src/blogMeta.ts
 *.njsproj
 *.sln
 *.sw?
+
+# Generated at build time by scripts/gen-sitemap.mjs
+public/sitemap.xml

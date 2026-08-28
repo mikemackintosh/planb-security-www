@@ -6,6 +6,7 @@ import { Markdown, headingSlug } from '../components/Markdown'
 import { FormattedDate } from '../FormattedDate'
 import { PlayIcon } from '../PlayIcon'
 import { useMeta } from '../useMeta'
+import { StructuredData, SITE_URL, PUBLISHER, AUTHOR } from '../components/StructuredData'
 
 interface ArticlePageProps {
   episodes: Episode[]
@@ -67,7 +68,9 @@ export function ArticlePage({ episodes }: ArticlePageProps) {
   }, [sections])
 
   useMeta({
-    title: article?.title,
+    // The short variant keeps <title> under Google's ~60ch truncation; the H1
+    // below still renders the full headline.
+    title: article?.seoTitle,
     description: article?.deck || undefined,
     url: article ? `/blog/${article.slug}` : undefined,
   })
@@ -83,8 +86,27 @@ export function ArticlePage({ episodes }: ArticlePageProps) {
   const index = ordered.findIndex((a) => a.slug === article.slug)
   const next = index >= 0 && index < ordered.length - 1 ? ordered[index + 1] : null
 
+  const published = episode ? new Date(episode.published).toISOString() : undefined
+
   return (
     <div className="mx-auto max-w-5xl px-4 py-10 sm:px-6">
+      <StructuredData
+        data={{
+          '@context': 'https://schema.org',
+          '@type': 'BlogPosting',
+          headline: article.title,
+          description: article.deck || undefined,
+          url: `${SITE_URL}/blog/${article.slug}`,
+          mainEntityOfPage: { '@type': 'WebPage', '@id': `${SITE_URL}/blog/${article.slug}` },
+          datePublished: published,
+          dateModified: published,
+          timeRequired: `PT${article.minutes}M`,
+          articleSection: `Season ${article.season}`,
+          image: `${SITE_URL}/logo.png`,
+          author: AUTHOR,
+          publisher: PUBLISHER,
+        }}
+      />
       <Link
         to="/blog"
         className="font-mono text-[11px] font-medium uppercase tracking-[0.14em] text-ink-faint transition hover:text-ink"

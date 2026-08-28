@@ -3,6 +3,7 @@ import { EpisodeEntry } from '../components/EpisodeEntry'
 import { SpotifyIcon, ApplePodcastIcon, RSSIcon, YouTubeIcon } from '../components/icons'
 import { articleMetas, seasonEpisode } from '../blog'
 import { useMeta } from '../useMeta'
+import { StructuredData, SITE_URL, PUBLISHER, AUTHOR } from '../components/StructuredData'
 
 const subscribeLinks = [
   ['Spotify', SpotifyIcon, 'https://open.spotify.com/show/1I1lWiytUs20VRnLz1aUQb'],
@@ -35,6 +36,28 @@ export function HomePage({ episodes }: HomePageProps) {
 
   return (
     <>
+      <StructuredData
+        data={{
+          '@context': 'https://schema.org',
+          '@type': 'PodcastSeries',
+          name: 'PlanB Security',
+          alternateName: 'PlanB Security — The InfoSec Podcast',
+          url: SITE_URL,
+          description:
+            'A podcast about all things InfoSec — new laws, threats, tooling and ways of thinking to help you build a strong security program.',
+          image: `${SITE_URL}/logo.png`,
+          webFeed: 'https://anchor.fm/s/e741494c/podcast/rss',
+          numberOfEpisodes: episodes.length,
+          author: AUTHOR,
+          publisher: PUBLISHER,
+          sameAs: [
+            'https://open.spotify.com/show/1I1lWiytUs20VRnLz1aUQb',
+            'https://podcasts.apple.com/gb/podcast/plan-b-security/id1702358824',
+            'https://www.youtube.com/channel/UCLG2Xu72da2a8xP6-1UxkwQ',
+          ],
+        }}
+      />
+
       {/* Hero — the thesis lands on two words, not a gradient. */}
       <section className="mx-auto max-w-6xl px-4 pt-14 sm:px-6 sm:pt-20">
         <div className="animate-fade-up">

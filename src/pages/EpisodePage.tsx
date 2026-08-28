@@ -7,6 +7,7 @@ import { PauseIcon } from '../PauseIcon'
 import { PlayIcon } from '../PlayIcon'
 import { useMeta } from '../useMeta'
 import { articleMetaForEpisode, seasonEpisode } from '../blog'
+import { StructuredData, SITE_URL, PUBLISHER, AUTHOR, isoDuration } from '../components/StructuredData'
 
 interface EpisodePageProps {
   episodes: Episode[]
@@ -46,6 +47,22 @@ export function EpisodePage({ episodes }: EpisodePageProps) {
 
   return (
     <div className="mx-auto max-w-4xl px-4 py-10 sm:px-6">
+      <StructuredData
+        data={{
+          '@context': 'https://schema.org',
+          '@type': 'PodcastEpisode',
+          name: episode.title,
+          description: plainText(html, 300),
+          url: `${SITE_URL}/episodes/${episode.slug}`,
+          datePublished: new Date(episode.published).toISOString(),
+          timeRequired: isoDuration(episode.itunes_duration),
+          ...(se ? { episodeNumber: se[1], partOfSeason: { '@type': 'PodcastSeason', seasonNumber: se[0] } } : {}),
+          partOfSeries: { '@type': 'PodcastSeries', name: 'PlanB Security', url: SITE_URL },
+          associatedMedia: { '@type': 'MediaObject', contentUrl: episode.audio.src },
+          author: AUTHOR,
+          publisher: PUBLISHER,
+        }}
+      />
       <Link
         to="/"
         className="font-mono text-[11px] font-medium uppercase tracking-[0.14em] text-ink-faint transition hover:text-ink"
