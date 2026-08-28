@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom'
 import { type Episode } from '../episodes'
-import { articleMetas, episodeForArticle, type ArticleMeta } from '../blog'
+import { articleMetas, articleDate, episodeForArticle, type ArticleMeta } from '../blog'
 import { FormattedDate } from '../FormattedDate'
 import { useMeta } from '../useMeta'
 
@@ -11,6 +11,7 @@ interface BlogPageProps {
 interface Entry {
   article: ArticleMeta
   episode: Episode | null
+  date: Date | null
 }
 
 /** Newest first: season desc, then episode desc. */
@@ -27,7 +28,11 @@ export function BlogPage({ episodes }: BlogPageProps) {
   })
 
   const entries: Entry[] = articleMetas
-    .map((article) => ({ article, episode: episodeForArticle(article, episodes) }))
+    .map((article) => ({
+      article,
+      episode: episodeForArticle(article, episodes),
+      date: articleDate(article, episodes),
+    }))
     .sort(byRecency)
 
   const [lead, ...rest] = entries
@@ -44,7 +49,7 @@ export function BlogPage({ episodes }: BlogPageProps) {
 
   function seasonYears(list: Entry[]) {
     const years = list
-      .map((e) => (e.episode ? new Date(e.episode.published).getFullYear() : null))
+      .map((e) => (e.date ? e.date.getFullYear() : null))
       .filter((y): y is number => y !== null)
     if (!years.length) return null
     const lo = Math.min(...years)
@@ -80,7 +85,7 @@ export function BlogPage({ episodes }: BlogPageProps) {
             <span>
               S{lead.article.season}E{String(lead.article.episode).padStart(2, '0')}
             </span>
-            {lead.episode && <FormattedDate date={new Date(lead.episode.published)} short />}
+            {lead.date && <FormattedDate date={lead.date} short />}
             <span>{lead.article.minutes} min read</span>
           </div>
           <h2 className="mt-4 max-w-[22ch] font-headline text-[clamp(1.6rem,3.6vw,2.5rem)] font-bold leading-[1.1] tracking-[-0.022em] text-ink transition group-hover:text-brand-violet">
@@ -108,7 +113,7 @@ export function BlogPage({ episodes }: BlogPageProps) {
             </div>
 
             <div className="mt-3">
-              {list.map(({ article, episode }) => (
+              {list.map(({ article, date }) => (
                 <Link
                   key={article.slug}
                   to={`/blog/${article.slug}`}
@@ -123,7 +128,7 @@ export function BlogPage({ episodes }: BlogPageProps) {
                     E{String(article.episode).padStart(2, '0')}
                   </span>
                   <span className="col-start-2 font-mono text-[11px] uppercase tabular-nums tracking-[0.06em] text-ink-faint md:col-auto">
-                    {episode ? <FormattedDate date={new Date(episode.published)} short /> : '—'}
+                    {date ? <FormattedDate date={date} short /> : '—'}
                   </span>
                   <span className="col-start-2 font-headline text-base font-semibold leading-[1.35] tracking-[-0.01em] text-ink transition group-hover:text-brand-violet md:col-auto">
                     {article.title}

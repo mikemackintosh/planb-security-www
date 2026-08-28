@@ -2,6 +2,8 @@
 
 ## How we put a local LLM on the internet without exposing it, with identity, authentication, authorization, and accounting on every request
 
+
+<!-- published: 2026-08-26 -->
 ---
 
 ## How this started

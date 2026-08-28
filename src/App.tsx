@@ -3,7 +3,7 @@ import { BrowserRouter, Routes, Route, Navigate, useParams, Link } from 'react-r
 import './App.css'
 import { AudioProvider } from './AudioProvider'
 import { AudioPlayer } from './components/player/AudioPlayer'
-import { type Episode, getAllEpisodes } from './episodes'
+import { type Episode, episodes } from './episodes'
 import { GTMProvider } from '@elgorditosalsero/react-gtm-hook'
 import { HomePage } from './pages/HomePage'
 import { EpisodePage } from './pages/EpisodePage'
@@ -29,8 +29,6 @@ const social = [
   { name: 'Spotify', href: 'https://open.spotify.com/show/1I1lWiytUs20VRnLz1aUQb', icon: SpotifyIcon },
   { name: 'Apple Podcasts', href: 'https://podcasts.apple.com/gb/podcast/plan-b-security/id1702358824', icon: ApplePodcastIcon },
 ]
-
-let episodes = await getAllEpisodes("https://anchor.fm/s/e741494c/podcast/rss")
 
 // Legacy redirect component for old numeric URLs
 function LegacyRedirect({ episodes }: { episodes: Episode[] }) {

@@ -4,11 +4,14 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
+    "gen:episodes": "node scripts/gen-episodes.mjs",
     "gen:blog": "node scripts/gen-blog-index.mjs",
     "gen:sitemap": "node scripts/gen-sitemap.mjs",
-    "predev": "node scripts/gen-blog-index.mjs",
+    "prerender": "node scripts/prerender.mjs",
+    "predev": "node scripts/gen-episodes.mjs && node scripts/gen-blog-index.mjs",
     "dev": "vite",
-    "prebuild": "node scripts/gen-blog-index.mjs && node scripts/gen-sitemap.mjs",
+    "prebuild": "node scripts/gen-episodes.mjs && node scripts/gen-blog-index.mjs && node scripts/gen-sitemap.mjs",
+    "postbuild": "node scripts/prerender.mjs",
     "build": "vite build",
     "lint": "eslint . --ext js,jsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview"

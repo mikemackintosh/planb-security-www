@@ -28,3 +28,6 @@ src/blogMeta.ts
 
 # Generated at build time by scripts/gen-sitemap.mjs
 public/sitemap.xml
+
+# Generated at build time by scripts/gen-episodes.mjs
+src/episodes.json

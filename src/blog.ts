@@ -43,6 +43,17 @@ export function articleMetaForEpisode(ep: Episode): ArticleMeta | null {
   return se ? metaByKey.get(`${se[0]}-${se[1]}`) ?? null : null
 }
 
+/**
+ * An article's publish date: its explicit `<!-- published: -->` stamp if it has
+ * one, otherwise the date of the episode it accompanies. Posts can ship ahead
+ * of their episode, so the feed is not always able to answer this.
+ */
+export function articleDate(article: ArticleMeta, episodes: Episode[]): Date | null {
+  if (article.date) return new Date(article.date)
+  const ep = episodeForArticle(article, episodes)
+  return ep ? new Date(ep.published) : null
+}
+
 /** The podcast episode an article accompanies, if present in the feed. */
 export function episodeForArticle(article: ArticleMeta, episodes: Episode[]): Episode | null {
   return (

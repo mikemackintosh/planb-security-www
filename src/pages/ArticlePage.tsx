@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useParams, Link, Navigate } from 'react-router-dom'
 import { type Episode } from '../episodes'
-import { getArticleMeta, loadArticleBody, episodeForArticle, articleMetas } from '../blog'
+import { getArticleMeta, loadArticleBody, episodeForArticle, articleDate, articleMetas } from '../blog'
 import { Markdown, headingSlug } from '../components/Markdown'
 import { FormattedDate } from '../FormattedDate'
 import { PlayIcon } from '../PlayIcon'
@@ -87,7 +87,8 @@ export function ArticlePage({ episodes }: ArticlePageProps) {
   const index = ordered.findIndex((a) => a.slug === article.slug)
   const next = index >= 0 && index < ordered.length - 1 ? ordered[index + 1] : null
 
-  const published = episode ? new Date(episode.published).toISOString() : undefined
+  const resolvedDate = articleDate(article, episodes)
+  const published = resolvedDate ? resolvedDate.toISOString() : undefined
 
   return (
     <div className="mx-auto max-w-5xl px-4 py-10 sm:px-6">
@@ -136,7 +137,7 @@ export function ArticlePage({ episodes }: ArticlePageProps) {
               </p>
             )}
             <div className="mt-6 flex flex-wrap gap-x-5 gap-y-2 font-mono text-[11px] uppercase tracking-[0.12em] text-ink-faint">
-              {episode && <FormattedDate date={new Date(episode.published)} short />}
+              {resolvedDate && <FormattedDate date={resolvedDate} short />}
               <span>{article.minutes} min read</span>
             </div>
             {episode && (
