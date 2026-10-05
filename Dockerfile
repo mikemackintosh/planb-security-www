@@ -1,7 +1,10 @@
 # syntax=docker/dockerfile:1
 
 # ---- Build stage: compile the static site from source ----
-FROM node:20-alpine AS builder
+# Runs on the host's native platform: the output is static files, and esbuild
+# (a Go binary) crashes with `fatal error: lfstack.push` under amd64 emulation
+# on Apple Silicon.
+FROM --platform=$BUILDPLATFORM node:20-alpine AS builder
 
 WORKDIR /app
 
