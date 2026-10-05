@@ -15,7 +15,7 @@ We knew that going in, and we were not willing to put the machine on the interne
 ## What we built
 
 <figure>
-<img src="/img/s3e05-your-home-gpu-is-on-shodan.webp" width="1672" height="941" loading="lazy" decoding="async" alt="Diagram: what happens on every request. Eight stages run left to right — a user or app request, identify the requester, authenticate, authorize, then an allow-or-deny decision. Allow continues to account and audit, forward to the local LLM API, the model server, and finally the response. Deny blocks access. Callouts note that there is no anonymous access, policy is evaluated before model access, every request carries per-user accountability, and every request leaves a trail. A band underneath traces the full chain: identity, authentication, authorization, accounting." />
+<img src="/img/s3e06-your-home-gpu-is-on-shodan.webp" width="1672" height="941" loading="lazy" decoding="async" alt="Diagram: what happens on every request. Eight stages run left to right — a user or app request, identify the requester, authenticate, authorize, then an allow-or-deny decision. Allow continues to account and audit, forward to the local LLM API, the model server, and finally the response. Deny blocks access. Callouts note that there is no anonymous access, policy is evaluated before model access, every request carries per-user accountability, and every request leaves a trail. A band underneath traces the full chain: identity, authentication, authorization, accounting." />
 <figcaption>Every request clears identity, authentication, authorization and accounting before the model sees it — a denial never reaches the model server at all.</figcaption>
 </figure>
 
